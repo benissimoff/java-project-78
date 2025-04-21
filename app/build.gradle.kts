@@ -2,13 +2,13 @@ plugins {
     java
     application
     checkstyle
-    id("org.sonarqube") version "6.1.0.5360"
+    id("org.sonarqube") version "6.0.1.5171"
     jacoco
 }
 
 sonar {
     properties {
-        property("sonar.projectKey", "benissimoff_java-project-71")
+        property("sonar.projectKey", "benissimoff_java-project-78")
         property("sonar.organization", "benissimoff")
         property("sonar.host.url", "https://sonarcloud.io")
     }
