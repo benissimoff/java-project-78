@@ -1,5 +1,21 @@
 plugins {
-    id("java")
+    java
+    application
+    checkstyle
+    id("org.sonarqube") version "6.1.0.5360"
+
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "benissimoff_java-project-71")
+        property("sonar.organization", "benissimoff")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
+}
+
+application {
+    mainClass.set("hexlet.code.App")
 }
 
 group = "hexlet.code"
