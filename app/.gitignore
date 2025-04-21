@@ -45,3 +45,4 @@ bin/
 .idea
 # Ignore Gradle build output directory
 build
+README.md
