@@ -1,5 +1,5 @@
 package hexlet.code.schemas;
 
-public interface Schema {
-    boolean isValid(String text);
+public abstract class Schema {
+    abstract boolean isValid(String text);
 }
