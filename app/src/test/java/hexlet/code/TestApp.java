@@ -79,7 +79,7 @@ public class TestApp {
         actual = schema.isValid(testNumber);
         assertTrue(actual); // true
 
-// Пока не вызван метод required(), null считается валидным
+        // Пока не вызван метод required(), null считается валидным
         actual = schema.isValid(null);
         assertTrue(actual); // true
 
@@ -212,5 +212,69 @@ public class TestApp {
         human3.put("lastName", "B");
         actual = schema.isValid(human3); // false
         assertFalse(actual);
+    }
+
+    @Test
+    public void testStringFromHexlet() {
+        boolean actual;
+        String testText = "";
+        var v = new Validator();
+
+        // Проверки накапливаются в схеме, а не заменяют друг друга
+        var schema = v.string().required().minLength(MAGIC_NUMBER_5).contains("hex");
+
+        testText = "do you wanna test wwwhexlet?";
+        actual = schema.isValid(testText);
+        assertTrue(actual);
+
+        testText = "there is no he xx in this level";
+        actual = schema.isValid(testText);
+        assertFalse(actual);
+
+        schema = v.string();
+
+        // Пока не вызван метод required(), null и пустая строка считаются валидным
+        actual = schema.isValid(""); // true
+        assertTrue(actual);
+
+        actual = schema.isValid(null); // true
+        assertTrue(actual);
+
+
+        schema.required();
+
+        actual = schema.isValid(null); // false
+        assertFalse(actual);
+
+        actual = schema.isValid(""); // false
+        assertFalse(actual);
+
+        actual = schema.isValid("what does the fox say"); // true
+        assertTrue(actual);
+
+        actual = schema.isValid("hexlet"); // true
+        assertTrue(actual);
+
+
+        actual = schema.contains("wh").isValid("what does the fox say"); // true
+        assertTrue(actual);
+
+        actual = schema.contains("what").isValid("what does the fox say"); // true
+        assertTrue(actual);
+
+        actual = schema.contains("whatthe").isValid("what does the fox say"); // false
+        assertFalse(actual);
+
+        actual = schema.isValid("what does the fox say"); // false
+        assertFalse(actual);
+
+        // Здесь уже false, так как добавлена еще одна проверка contains("whatthe")
+
+        // Если один валидатор вызывался несколько раз
+        // то последний имеет приоритет (перетирает предыдущий)
+        var schema1 = v.string();
+        actual = schema1.minLength(MAGIC_NUMBER_10).minLength(MAGIC_NUMBER_5).isValid("Hexlet"); // true
+        assertTrue(actual);
+
     }
 }

@@ -7,13 +7,13 @@ import java.util.function.Function;
 public final class MapSchema<K, V> extends BaseSchema<Map<K, V>> {
     public MapSchema<K, V> required() {
         Function<Map<K, V>, Boolean> check = Objects::nonNull;
-        super.addCheck(check);
+        super.addCheck("required", check);
         return this;
     }
 
     public MapSchema<K, V> sizeof(int size) {
         Function<Map<K, V>, Boolean> check = (map) -> map.size() == size;
-        super.addCheck(check);
+        super.addCheck("sizeof", check);
         return this;
     }
 
@@ -21,11 +21,8 @@ public final class MapSchema<K, V> extends BaseSchema<Map<K, V>> {
         for (var line : schemas.entrySet()) {
             K entryFieldName = line.getKey();
             BaseSchema<V> entrySchema = line.getValue();
-            Function<Map<K, V>, Boolean> check = param -> {
-                return entrySchema.isValid(param.get(entryFieldName));
-
-            };
-            super.addCheck(check);
+            Function<Map<K, V>, Boolean> check = param -> entrySchema.isValid(param.get(entryFieldName));
+            super.addCheck("shape", check);
         }
 
         return this;

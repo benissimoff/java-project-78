@@ -6,7 +6,7 @@ public final class StringSchema extends BaseSchema<String> {
     public StringSchema required() {
         Function<String, Boolean> check = text -> text != null && !text.isEmpty();
 
-        super.addCheck(check);
+        super.addCheck("required", check);
 
         return this;
     }
@@ -14,7 +14,7 @@ public final class StringSchema extends BaseSchema<String> {
     public StringSchema minLength(int minSize) {
         Function<String, Boolean> check = text -> text != null && text.length() >= minSize;
 
-        super.addCheck(check);
+        super.addCheck("minLength", check);
 
         return this;
     }
@@ -22,7 +22,7 @@ public final class StringSchema extends BaseSchema<String> {
     public StringSchema contains(String containText) {
         Function<String, Boolean> check = text -> text != null && text.contains(containText);
 
-        super.addCheck(check);
+        super.addCheck("contains", check);
 
         return this;
     };

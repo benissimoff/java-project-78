@@ -1,13 +1,14 @@
 package hexlet.code.schemas;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 public abstract class BaseSchema<T> {
-    private final List<Function<T, Boolean>> checks = new ArrayList<>();
+    private final Map<String, Function<T, Boolean>> validations = new HashMap<>();
+
     public final boolean isValid(T param) {
-        for (var check : checks) {
+        for (var check : validations.values()) {
             var result = !check.apply(param);
             if (result) {
                 return false;
@@ -17,7 +18,7 @@ public abstract class BaseSchema<T> {
         return true;
     }
 
-    protected final void addCheck(Function<T, Boolean> checkFunction) {
-        checks.add(checkFunction);
+    protected final void addCheck(String checkName, Function<T, Boolean> checkFunction) {
+        validations.put(checkName, checkFunction);
     }
 }
