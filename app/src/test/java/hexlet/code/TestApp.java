@@ -1,24 +1,15 @@
 package hexlet.code;
 
+import hexlet.code.schemas.BaseSchema;
 import hexlet.code.schemas.StringSchema;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestApp {
-    @Test
-    public void testSimple() {
-
-        System.out.println("!!! === testSimple");
-
-
-        String actual = "app";
-
-        assertEquals("app", actual);
-    }
-
     @Test
     public void checkString() {
 
@@ -64,6 +55,11 @@ public class TestApp {
         testTextFail = "87603424";
         actual = stringValidator.isValid(testTextFail);
         assertFalse(actual);
+
+        var longValidator = validator.string().required().minLength(2).contains("bca");
+        testTextTrue = "abcabc";
+        actual = longValidator.isValid(testTextTrue);
+        assertTrue(actual);
 
     }
 
@@ -115,6 +111,15 @@ public class TestApp {
         actual = schema.isValid(11); // false
         assertFalse(actual);
 
+        var longValidator = v.number().required().positive().range(0, 99);
+        var number = 77;
+        actual = longValidator.isValid(number);
+        assertTrue(actual);
+
+        number = 999;
+        actual = longValidator.isValid(number);
+        assertFalse(actual);
+
     }
 
     @Test
@@ -153,5 +158,47 @@ public class TestApp {
         actual = schema.isValid(data); // true
         assertTrue(actual);
 
+    }
+
+    @Test
+    public void testMapShape() {
+        var v = new Validator();
+
+        var schema = v.map();
+
+        boolean actual;
+// shape позволяет описывать валидацию для значений каждого ключа объекта Map
+// Создаем набор схем для проверки каждого ключа проверяемого объекта
+// Для значения каждого ключа - своя схема
+        Map<String, BaseSchema<String>> schemas = new HashMap<>();
+
+// Определяем схемы валидации для значений свойств "firstName" и "lastName"
+// Имя должно быть строкой, обязательно для заполнения
+        schemas.put("firstName", v.string().required());
+// Фамилия обязательна для заполнения и должна содержать не менее 2 символов
+        schemas.put("lastName", v.string().required().minLength(2));
+
+// Настраиваем схему `MapSchema`
+// Передаем созданный набор схем в метод shape()
+        schema.shape(schemas);
+
+// Проверяем объекты
+        Map<String, String> human1 = new HashMap<>();
+        human1.put("firstName", "John");
+        human1.put("lastName", "Smith");
+        actual = schema.isValid(human1); // true
+        assertTrue(actual);
+
+        Map<String, String> human2 = new HashMap<>();
+        human2.put("firstName", "John");
+        human2.put("lastName", null);
+        actual = schema.isValid(human2); // false
+        assertFalse(actual);
+
+        Map<String, String> human3 = new HashMap<>();
+        human3.put("firstName", "Anna");
+        human3.put("lastName", "B");
+        actual = schema.isValid(human3); // false
+        assertFalse(actual);
     }
 }
