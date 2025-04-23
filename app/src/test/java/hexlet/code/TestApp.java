@@ -3,6 +3,8 @@ package hexlet.code;
 import hexlet.code.schemas.StringSchema;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestApp {
@@ -112,6 +114,44 @@ public class TestApp {
 
         actual = schema.isValid(11); // false
         assertFalse(actual);
+
+    }
+
+    @Test
+    public void testMap() {
+        System.out.println("TEST MAP");
+
+        var v = new Validator();
+
+        var schema = v.map();
+
+        boolean actual;
+
+        actual = schema.isValid(null); // true
+        assertTrue(actual);
+
+        schema.required();
+
+        actual = schema.isValid(null); // false
+        assertFalse(actual);
+
+        actual = schema.isValid(new HashMap<>()); // true
+        assertTrue(actual);
+
+        var data = new HashMap<String, String>();
+        data.put("key1", "value1");
+        actual = schema.isValid(data); // true
+        assertTrue(actual);
+
+
+        schema.sizeOf(2);
+
+        actual = schema.isValid(data);  // false
+        assertFalse(actual);
+
+        data.put("key2", "value2");
+        actual = schema.isValid(data); // true
+        assertTrue(actual);
 
     }
 }

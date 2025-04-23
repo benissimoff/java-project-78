@@ -2,6 +2,7 @@ package hexlet.code.schemas;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 public abstract class BaseSchema<T> {
@@ -22,5 +23,11 @@ public abstract class BaseSchema<T> {
 
     protected void addCheck(Function<T, Boolean> checkFunction) {
         checks.add(checkFunction);
+    }
+
+    public BaseSchema<T> required() {
+        Function<T, Boolean> check = Objects::nonNull;
+        this.addCheck(check);
+        return this;
     }
 }
