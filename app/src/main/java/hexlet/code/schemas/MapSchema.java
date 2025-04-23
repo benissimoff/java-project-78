@@ -11,7 +11,7 @@ public final class MapSchema<K, V> extends BaseSchema<Map<K, V>> {
         return this;
     }
 
-    public MapSchema<K, V> sizeOf(int size) {
+    public MapSchema<K, V> sizeof(int size) {
         Function<Map<K, V>, Boolean> check = (map) -> map.size() == size;
         super.addCheck(check);
         return this;

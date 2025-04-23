@@ -11,6 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class TestApp {
+    private static final int MIN_LENGTH = 3;
+    private static final int MAGIC_NUMBER_3 = 3;
+    private static final int MAGIC_NUMBER_5 = 5;
+    private static final int MAGIC_NUMBER_10 = 10;
+    private static final int MAGIC_NUMBER_99 = 99;
+
+
     @Test
     public void checkString() {
         Validator validator = new Validator();
@@ -30,8 +37,8 @@ public class TestApp {
         actual = stringValidator.isValid("test");
         assertTrue(actual);
 
-        var minLen = 3;
-        stringValidator.minLength(minLen);
+
+        stringValidator.minLength(MIN_LENGTH);
         String testTextFail = "12";
         actual = stringValidator.isValid(testTextFail);
         assertFalse(actual);
@@ -68,7 +75,7 @@ public class TestApp {
         var schema = v.number();
         boolean actual;
 
-        var testNumber = 5;
+        var testNumber = MAGIC_NUMBER_5;
         actual = schema.isValid(testNumber);
         assertTrue(actual); // true
 
@@ -84,12 +91,12 @@ public class TestApp {
         actual = schema.isValid(null); // false
         assertFalse(actual);
 
-        testNumber = 10;
+        testNumber = MAGIC_NUMBER_10;
         actual = schema.isValid(testNumber); // true
         assertTrue(actual);
 
         // Потому что ранее мы вызвали метод positive()
-        testNumber = -10;
+        testNumber = -MAGIC_NUMBER_10;
         actual = schema.isValid(testNumber); // false
         assertFalse(actual);
 
@@ -98,34 +105,34 @@ public class TestApp {
         actual = schema.isValid(testNumber); // false
         assertFalse(actual);
 
-        var start = 5;
-        var finish = 10;
+        var start = MAGIC_NUMBER_5;
+        var finish = MAGIC_NUMBER_10;
         schema.range(start, finish);
 
-        testNumber = 5;
+        testNumber = MAGIC_NUMBER_5;
         actual = schema.isValid(testNumber); // true
         assertTrue(actual);
 
-        testNumber = 10;
+        testNumber = MAGIC_NUMBER_10;
         actual = schema.isValid(testNumber); // true
         assertTrue(actual);
 
-        testNumber = 4;
+        testNumber = MAGIC_NUMBER_3;
         actual = schema.isValid(testNumber); // false
         assertFalse(actual);
 
-        testNumber = 11;
+        testNumber = MAGIC_NUMBER_99;
         actual = schema.isValid(testNumber); // false
         assertFalse(actual);
 
         start = 0;
-        finish = 99;
+        finish = MAGIC_NUMBER_99;
         var longValidator = v.number().required().positive().range(start, finish);
-        var number = 77;
+        var number = MAGIC_NUMBER_10;
         actual = longValidator.isValid(number);
         assertTrue(actual);
 
-        number = 999;
+        number = MAGIC_NUMBER_99 * MAGIC_NUMBER_10;
         actual = longValidator.isValid(number);
         assertFalse(actual);
 
@@ -154,7 +161,7 @@ public class TestApp {
         assertTrue(actual);
 
 
-        schema.sizeOf(2);
+        schema.sizeof(2);
 
         actual = schema.isValid(data);  // false
         assertFalse(actual);
