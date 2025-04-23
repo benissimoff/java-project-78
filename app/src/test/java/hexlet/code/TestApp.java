@@ -12,9 +12,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestApp {
     @Test
     public void checkString() {
-
-        System.out.println("!!! === checkString");
-
         Validator validator = new Validator();
         StringSchema stringValidator;
         stringValidator = validator.string();
@@ -40,7 +37,6 @@ public class TestApp {
         String testTextTrue = "123";
         actual = stringValidator.isValid(testTextTrue);
         assertTrue(actual);
-//        assertFalse(actual);
 
         testTextTrue = "123456";
         actual = stringValidator.isValid(testTextTrue);
@@ -124,12 +120,8 @@ public class TestApp {
 
     @Test
     public void testMap() {
-        System.out.println("TEST MAP");
-
         var v = new Validator();
-
         var schema = v.map();
-
         boolean actual;
 
         actual = schema.isValid(null); // true
