@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class TestApp {
     @Test
@@ -29,7 +30,8 @@ public class TestApp {
         actual = stringValidator.isValid("test");
         assertTrue(actual);
 
-        stringValidator.minLength(3);
+        var minLen = 3;
+        stringValidator.minLength(minLen);
         String testTextFail = "12";
         actual = stringValidator.isValid(testTextFail);
         assertFalse(actual);
@@ -66,7 +68,8 @@ public class TestApp {
         var schema = v.number();
         boolean actual;
 
-        actual = schema.isValid(5);
+        var testNumber = 5;
+        actual = schema.isValid(testNumber);
         assertTrue(actual); // true
 
 // Пока не вызван метод required(), null считается валидным
@@ -81,33 +84,43 @@ public class TestApp {
         actual = schema.isValid(null); // false
         assertFalse(actual);
 
-        actual = schema.isValid(10); // true
+        testNumber = 10;
+        actual = schema.isValid(testNumber); // true
         assertTrue(actual);
 
-// Потому что ранее мы вызвали метод positive()
-        actual = schema.isValid(-10); // false
-        assertFalse(actual);
-//  Ноль — не положительное число
-
-        actual = schema.isValid(0); // false
+        // Потому что ранее мы вызвали метод positive()
+        testNumber = -10;
+        actual = schema.isValid(testNumber); // false
         assertFalse(actual);
 
-        schema.range(5, 10);
+        //  Ноль — не положительное число
+        testNumber = 0;
+        actual = schema.isValid(testNumber); // false
+        assertFalse(actual);
 
+        var start = 5;
+        var finish = 10;
+        schema.range(start, finish);
 
-        actual = schema.isValid(5); // true
+        testNumber = 5;
+        actual = schema.isValid(testNumber); // true
         assertTrue(actual);
 
-        actual = schema.isValid(10); // true
+        testNumber = 10;
+        actual = schema.isValid(testNumber); // true
         assertTrue(actual);
 
-        actual = schema.isValid(4); // false
+        testNumber = 4;
+        actual = schema.isValid(testNumber); // false
         assertFalse(actual);
 
-        actual = schema.isValid(11); // false
+        testNumber = 11;
+        actual = schema.isValid(testNumber); // false
         assertFalse(actual);
 
-        var longValidator = v.number().required().positive().range(0, 99);
+        start = 0;
+        finish = 99;
+        var longValidator = v.number().required().positive().range(start, finish);
         var number = 77;
         actual = longValidator.isValid(number);
         assertTrue(actual);
