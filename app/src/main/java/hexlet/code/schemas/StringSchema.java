@@ -1,10 +1,11 @@
 package hexlet.code.schemas;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public final class StringSchema extends BaseSchema<String> {
     public StringSchema required() {
-        Function<String, Boolean> check = text -> text != null && !text.isEmpty();
+        Predicate<String> check = text -> text != null && !text.isEmpty();
 
         super.addCheck("required", check);
 
@@ -12,19 +13,23 @@ public final class StringSchema extends BaseSchema<String> {
     }
 
     public StringSchema minLength(int minSize) {
-        Function<String, Boolean> check = text -> text != null && text.length() >= minSize;
+        Predicate<String> check = text -> text != null && text.length() >= minSize;
 
-        super.addCheck("minLength", check);
+        addCheck("minLength", check);
 
         return this;
     }
 
     public StringSchema contains(String containText) {
-        Function<String, Boolean> check = text -> text != null && text.contains(containText);
+        Predicate<String> check = text -> text != null && text.contains(containText);
 
-        super.addCheck("contains", check);
+        addCheck("contains", check);
 
         return this;
     };
+
+    protected void addCheck(String checkName, Predicate<String> checkFunction) {
+        super.addCheck(checkName, checkFunction);
+    }
 
 }
