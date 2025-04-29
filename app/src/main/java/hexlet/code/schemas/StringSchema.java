@@ -1,6 +1,5 @@
 package hexlet.code.schemas;
 
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 public final class StringSchema extends BaseSchema<String> {

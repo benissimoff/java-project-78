@@ -1,280 +1,275 @@
 package hexlet.code;
 
 import hexlet.code.schemas.BaseSchema;
+import hexlet.code.schemas.NumberSchema;
 import hexlet.code.schemas.StringSchema;
 import org.junit.jupiter.api.Test;
-
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import java.util.HashMap;
 import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class TestApp {
+public final class TestApp {
+    private static Validator validator = new Validator();
     private static final int MIN_LENGTH = 3;
     private static final int MAGIC_NUMBER_3 = 3;
     private static final int MAGIC_NUMBER_5 = 5;
     private static final int MAGIC_NUMBER_10 = 10;
     private static final int MAGIC_NUMBER_99 = 99;
 
+    @ParameterizedTest
+    @ValueSource(strings = {"", "abc", "long text"})
+    public void checkSimpleStringValidator(String param) {
+        StringSchema stringSimpleValidator = validator.string();
+        boolean actual = stringSimpleValidator.isValid(param);
+        assertTrue(actual);
+    }
+
+    @ParameterizedTest
+    @NullSource
+    public void checkStringRequiredNull(String param) {
+        StringSchema simpleValidator = validator.string();
+        StringSchema requireValidator = validator.string().required();
+
+        assertTrue(simpleValidator.isValid(param));
+        assertFalse(requireValidator.isValid(param));
+    }
 
     @Test
-    public void checkString() {
-        Validator validator = new Validator();
-        StringSchema stringValidator;
-        stringValidator = validator.string();
-
-        String testEmptyText = "";
+    public void checkStringRequired() {
+        StringSchema stringValidator = validator.string().required();
+        String testText;
         boolean actual;
 
-        actual = stringValidator.isValid(testEmptyText);
-        assertTrue(actual);
-
-        stringValidator.required();
-        actual = stringValidator.isValid(null);
+        testText = "";
+        actual = stringValidator.isValid(testText);
         assertFalse(actual);
 
-        actual = stringValidator.isValid("test");
+        testText = "abc";
+        actual = stringValidator.isValid(testText);
         assertTrue(actual);
+    }
 
+    @Test
+    public void checkStringLength() {
 
-        stringValidator.minLength(MIN_LENGTH);
-        String testTextFail = "12";
-        actual = stringValidator.isValid(testTextFail);
+        StringSchema stringValidator = validator.string().minLength(MAGIC_NUMBER_5);
+
+        String testText;
+        boolean actual;
+
+        testText = null;
+        actual = stringValidator.isValid(testText);
         assertFalse(actual);
 
-        String testTextTrue = "123";
-        actual = stringValidator.isValid(testTextTrue);
-        assertTrue(actual);
+        testText = "12";
+        actual = stringValidator.isValid(testText);
+        assertFalse(actual);
 
-        testTextTrue = "123456";
-        actual = stringValidator.isValid(testTextTrue);
+        testText = "123";
+        actual = stringValidator.isValid(testText);
+        assertFalse(actual);
+
+        testText = "123456";
+        actual = stringValidator.isValid(testText);
         assertTrue(actual);
 
         stringValidator.contains("345");
 
-        testTextTrue = "123456";
-        actual = stringValidator.isValid(testTextTrue);
+        testText = "123456";
+        actual = stringValidator.isValid(testText);
         assertTrue(actual);
 
-        testTextFail = "87603424";
-        actual = stringValidator.isValid(testTextFail);
+        testText = "87603424";
+        actual = stringValidator.isValid(testText);
         assertFalse(actual);
 
         var longValidator = validator.string().required().minLength(2).contains("bca");
-        testTextTrue = "abcabc";
-        actual = longValidator.isValid(testTextTrue);
+        testText = "abcabc";
+        actual = longValidator.isValid(testText);
         assertTrue(actual);
 
     }
 
     @Test
-    public void testNumber() {
-        var v = new Validator();
-
-        var schema = v.number();
+    public void checkStringContain() {
+        StringSchema stringValidator = validator.string().contains("345");
+        String testText;
         boolean actual;
 
-        var testNumber = MAGIC_NUMBER_5;
-        actual = schema.isValid(testNumber);
-        assertTrue(actual); // true
+        testText = null;
+        actual = stringValidator.isValid(testText);
+        assertFalse(actual);
 
-        // Пока не вызван метод required(), null считается валидным
-        actual = schema.isValid(null);
-        assertTrue(actual); // true
+        testText = "";
+        actual = stringValidator.isValid(testText);
+        assertFalse(actual);
 
-        actual = schema.positive().isValid(null); // true
+        testText = "123456";
+        actual = stringValidator.isValid(testText);
         assertTrue(actual);
 
-        schema.required();
+        testText = "87603424";
+        actual = stringValidator.isValid(testText);
+        assertFalse(actual);
 
-        actual = schema.isValid(null); // false
+    }
+
+    @Test
+    public void checkStringLongValidator() {
+        StringSchema longValidator = validator.string().required().minLength(MIN_LENGTH).contains("bca");
+        String testText = "abcabc";
+        boolean actual = longValidator.isValid(testText);
+        assertTrue(actual);
+
+        StringSchema schema1 = validator.string();
+        actual = schema1.minLength(MAGIC_NUMBER_10).minLength(MAGIC_NUMBER_5).isValid("Hexlet"); // true
+        assertTrue(actual);
+    }
+
+    @Test
+    public void testNumber() {
+        var numberValidator = validator.number();
+        int testNumber;
+        boolean actual;
+
+        actual = numberValidator.isValid(null);
+        assertTrue(actual); // true
+
+        testNumber = MAGIC_NUMBER_10;
+        actual = numberValidator.isValid(testNumber);
+        assertTrue(actual);
+
+        // с этим тестом я не согласен
+        // с точки зрения математики "положительное число" это, во-первых, число
+        // ну, то есть как минимум не "null"/"пустота"
+        actual = numberValidator.positive().isValid(null);
+        assertTrue(actual);
+
+        numberValidator.required().positive();
+
+        actual = numberValidator.isValid(null);
+        assertFalse(actual);
+
+        testNumber = 0;
+        actual = numberValidator.isValid(testNumber);
+        assertFalse(actual);
+
+        testNumber = -MAGIC_NUMBER_10;
+        actual = numberValidator.isValid(testNumber);
         assertFalse(actual);
 
         testNumber = MAGIC_NUMBER_10;
-        actual = schema.isValid(testNumber); // true
+        actual = numberValidator.isValid(testNumber);
         assertTrue(actual);
+    }
 
-        // Потому что ранее мы вызвали метод positive()
-        testNumber = -MAGIC_NUMBER_10;
-        actual = schema.isValid(testNumber); // false
-        assertFalse(actual);
-
-        //  Ноль — не положительное число
-        testNumber = 0;
-        actual = schema.isValid(testNumber); // false
-        assertFalse(actual);
+    @Test
+    public void checkNumberRange() {
+        NumberSchema numberValidator = validator.number();
+        int testNumber;
+        boolean actual;
 
         var start = MAGIC_NUMBER_5;
         var finish = MAGIC_NUMBER_10;
-        schema.range(start, finish);
+        numberValidator.range(start, finish);
 
         testNumber = MAGIC_NUMBER_5;
-        actual = schema.isValid(testNumber); // true
+        actual = numberValidator.isValid(testNumber);
         assertTrue(actual);
 
         testNumber = MAGIC_NUMBER_10;
-        actual = schema.isValid(testNumber); // true
+        actual = numberValidator.isValid(testNumber);
         assertTrue(actual);
 
         testNumber = MAGIC_NUMBER_3;
-        actual = schema.isValid(testNumber); // false
+        actual = numberValidator.isValid(testNumber);
         assertFalse(actual);
 
         testNumber = MAGIC_NUMBER_99;
-        actual = schema.isValid(testNumber); // false
+        actual = numberValidator.isValid(testNumber);
+        assertFalse(actual);
+
+        actual = numberValidator.isValid(null);
         assertFalse(actual);
 
         start = 0;
         finish = MAGIC_NUMBER_99;
-        var longValidator = v.number().required().positive().range(start, finish);
-        var number = MAGIC_NUMBER_10;
-        actual = longValidator.isValid(number);
+        numberValidator.required().positive().range(start, finish);
+        testNumber = MAGIC_NUMBER_10;
+        actual = numberValidator.isValid(testNumber);
         assertTrue(actual);
 
-        number = MAGIC_NUMBER_99 * MAGIC_NUMBER_10;
-        actual = longValidator.isValid(number);
+        testNumber = MAGIC_NUMBER_99 * MAGIC_NUMBER_10;
+        actual = numberValidator.isValid(testNumber);
         assertFalse(actual);
 
     }
 
     @Test
     public void testMap() {
-        var v = new Validator();
-        var schema = v.map();
+        var schema = validator.map();
         boolean actual;
+        Map<String, String> testMap;
 
-        actual = schema.isValid(null); // true
+        actual = schema.isValid(null);
         assertTrue(actual);
 
         schema.required();
 
-        actual = schema.isValid(null); // false
+        actual = schema.isValid(null);
         assertFalse(actual);
 
-        actual = schema.isValid(new HashMap<>()); // true
+        testMap = new HashMap<>();
+        actual = schema.isValid(testMap);
         assertTrue(actual);
 
-        var data = new HashMap<String, String>();
-        data.put("key1", "value1");
-        actual = schema.isValid(data); // true
+        testMap = new HashMap<>();
+        testMap.put("key1", "value1");
+        actual = schema.isValid(testMap);
         assertTrue(actual);
-
 
         schema.sizeof(2);
 
-        actual = schema.isValid(data);  // false
+        actual = schema.isValid(testMap);
         assertFalse(actual);
 
-        data.put("key2", "value2");
-        actual = schema.isValid(data); // true
+        testMap.put("key2", "value2");
+        actual = schema.isValid(testMap);
         assertTrue(actual);
 
     }
 
     @Test
     public void testMapShape() {
-        var v = new Validator();
-
-        var schema = v.map();
-
+        var schema = validator.map();
         boolean actual;
-// shape позволяет описывать валидацию для значений каждого ключа объекта Map
-// Создаем набор схем для проверки каждого ключа проверяемого объекта
-// Для значения каждого ключа - своя схема
         Map<String, BaseSchema<String>> schemas = new HashMap<>();
 
-// Определяем схемы валидации для значений свойств "firstName" и "lastName"
-// Имя должно быть строкой, обязательно для заполнения
-        schemas.put("firstName", v.string().required());
-// Фамилия обязательна для заполнения и должна содержать не менее 2 символов
-        schemas.put("lastName", v.string().required().minLength(2));
+        schemas.put("firstName", validator.string().required());
+        schemas.put("lastName", validator.string().required().minLength(2));
 
-// Настраиваем схему `MapSchema`
-// Передаем созданный набор схем в метод shape()
         schema.shape(schemas);
 
-// Проверяем объекты
         Map<String, String> human1 = new HashMap<>();
         human1.put("firstName", "John");
         human1.put("lastName", "Smith");
-        actual = schema.isValid(human1); // true
+        actual = schema.isValid(human1);
         assertTrue(actual);
 
         Map<String, String> human2 = new HashMap<>();
         human2.put("firstName", "John");
         human2.put("lastName", null);
-        actual = schema.isValid(human2); // false
+        actual = schema.isValid(human2);
         assertFalse(actual);
 
         Map<String, String> human3 = new HashMap<>();
         human3.put("firstName", "Anna");
         human3.put("lastName", "B");
-        actual = schema.isValid(human3); // false
+        actual = schema.isValid(human3);
         assertFalse(actual);
-    }
-
-    @Test
-    public void testStringFromHexlet() {
-        boolean actual;
-        String testText = "";
-        var v = new Validator();
-
-        // Проверки накапливаются в схеме, а не заменяют друг друга
-        var schema = v.string().required().minLength(MAGIC_NUMBER_5).contains("hex");
-
-        testText = "do you wanna test wwwhexlet?";
-        actual = schema.isValid(testText);
-        assertTrue(actual);
-
-        testText = "there is no he xx in this level";
-        actual = schema.isValid(testText);
-        assertFalse(actual);
-
-        schema = v.string();
-
-        // Пока не вызван метод required(), null и пустая строка считаются валидным
-        actual = schema.isValid(""); // true
-        assertTrue(actual);
-
-        actual = schema.isValid(null); // true
-        assertTrue(actual);
-
-
-        schema.required();
-
-        actual = schema.isValid(null); // false
-        assertFalse(actual);
-
-        actual = schema.isValid(""); // false
-        assertFalse(actual);
-
-        actual = schema.isValid("what does the fox say"); // true
-        assertTrue(actual);
-
-        actual = schema.isValid("hexlet"); // true
-        assertTrue(actual);
-
-
-        actual = schema.contains("wh").isValid("what does the fox say"); // true
-        assertTrue(actual);
-
-        actual = schema.contains("what").isValid("what does the fox say"); // true
-        assertTrue(actual);
-
-        actual = schema.contains("whatthe").isValid("what does the fox say"); // false
-        assertFalse(actual);
-
-        actual = schema.isValid("what does the fox say"); // false
-        assertFalse(actual);
-
-        // Здесь уже false, так как добавлена еще одна проверка contains("whatthe")
-
-        // Если один валидатор вызывался несколько раз
-        // то последний имеет приоритет (перетирает предыдущий)
-        var schema1 = v.string();
-        actual = schema1.minLength(MAGIC_NUMBER_10).minLength(MAGIC_NUMBER_5).isValid("Hexlet"); // true
-        assertTrue(actual);
-
     }
 }

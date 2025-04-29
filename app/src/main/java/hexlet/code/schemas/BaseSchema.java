@@ -13,6 +13,11 @@ public abstract class BaseSchema<T> {
                 .allMatch((check) -> check.test(param));
     }
 
+    /**
+     * Add validation check to list of validations.
+     * @param checkName - name of validation
+     * @param checkFunction - validation function
+     */
     protected void addCheck(String checkName, Predicate<T> checkFunction) {
         validations.put(checkName, checkFunction);
     }
