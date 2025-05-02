@@ -12,14 +12,14 @@ public final class MapSchema<K, V> extends BaseSchema<Map<K, V>> {
     }
 
     public MapSchema<K, V> sizeof(int size) {
-        addCheck("sizeof", (map) -> map.size() == size);
+        addCheck("sizeof", (map) -> map != null && map.size() == size);
 
         return this;
     }
 
     public MapSchema<K, V> shape(Map<K, BaseSchema<V>> schemas) {
         schemas.forEach((itemKey, itemSchema) -> {
-            Predicate<Map<K, V>> check = param -> itemSchema.isValid(param.get(itemKey));
+            Predicate<Map<K, V>> check = param -> param != null && itemSchema.isValid(param.get(itemKey));
             addCheck("shape", check);
         });
 

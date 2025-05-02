@@ -9,6 +9,9 @@ public final class NumberSchema extends BaseSchema<Integer> {
         return this;
     }
 
+    // с этим тестом я не согласен
+    // с точки зрения математики "положительное число" это, во-первых, число
+    // ну, то есть не "null"/"пустота"
     public NumberSchema positive() {
         addCheck("positive", (n) -> n == null || n > 0);
         return this;
